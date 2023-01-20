@@ -1,0 +1,21 @@
+#! /usr/bin/env ruby
+require "pathname"
+require "fileutils"
+editor = ENV.fetch("OP_EDITOR", "vi")
+projects_dirname = ENV.fetch("OP_DIRNAME", nil)
+
+project_name = ARGV[0]
+if project_name.nil?
+  abort "no project name supplied" 
+end
+
+search_dir = Pathname.new("#{Dir.home}/#{projects_dirname}")
+search_results = search_dir.glob("**/#{project_name}")
+project_dir = search_results.find { |dir| dir.to_s =~ /#{search_dir}\/*#{project_name}/ }
+
+if project_dir.nil?
+  abort "no project with that name found in #{search_dir}"
+end
+
+FileUtils.chdir(project_dir)
+system "#{editor} ."
